@@ -11,4 +11,4 @@ set(IBCONS_HEADERS
   )
 
 add_executable(ibcons ${IBCONS_SOURCES} ${IBCONS_HEADERS})
-target_link_libraries(ibcons ncurses)
+target_link_libraries(ibcons ncursesw)
