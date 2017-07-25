@@ -7,3 +7,18 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+
+# Default build stuff
+build/*
+
+# Emacs and Vim stuff
+*.wsp
+*#*#
+*.#*
+*~
+
+# GNU Global
+GPATH
+GRTAGS
+GTAGS
+
