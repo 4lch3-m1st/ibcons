@@ -5,10 +5,14 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
 set(IBCONS_SOURCES
-  src/main.c)
+  src/main.c
+  src/aesthetics.c
+  src/winctrl.c)
 
 set(IBCONS_HEADERS
-  )
+  src/main.h
+  src/aesthetics.h
+  src/winctrl.h)
 
 add_executable(ibcons ${IBCONS_SOURCES} ${IBCONS_HEADERS})
-target_link_libraries(ibcons ncursesw)
+target_link_libraries(ibcons ncursesw panel)
