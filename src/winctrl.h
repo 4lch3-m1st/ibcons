@@ -3,11 +3,6 @@
 
 #include "main.h"
 
-typedef struct POSTVIEW_DEF
-{
-    PANEL* panel;
-} postview_t;
-
 typedef enum IBCONS_STATE_DEF
 {
     STATE_NONE      = 0u,
