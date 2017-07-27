@@ -23,7 +23,7 @@ void init_all(void)
     drawborders(commandline, 0);
 
     contentviewer = newwin(MAX_Y - 6, MAX_X, 3, 0);
-    //drawborders(contentviewer, 0);
+    drawborders(contentviewer, 0);
 }
 
 void dispose_all(void)
@@ -46,7 +46,7 @@ void refresh_all(void)
     // print dummy text
     mvwprintw(boardlist, 1, 1, "[board1 / board2 / board3]");
     mvwprintw(commandline, 1, 1, "> ");
-    wcentertext(contentviewer, "Choose a board to start browsing.");
+    //wcentertext(contentviewer, "Choose a board to start browsing.");
     
     wrefresh(stdscr);
     wrefresh(contentviewer);

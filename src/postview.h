@@ -3,6 +3,7 @@
 
 #include <panel.h>
 
+// Post data
 typedef struct POSTCONTENT_DEF
 {
     unsigned long long no;   // number
@@ -19,9 +20,9 @@ typedef struct POSTCONTENT_DEF
     // unsigned tn_w
     // unsigned h
     // unsigned w
-    // unsigned long long fsize
-    // char* filename
-    // char* ext
+    unsigned long long fsize;
+    char*              filename; 
+    char*              ext;
     // char* tim
     // char* md5
     unsigned long long resto; // answers post #
@@ -32,18 +33,39 @@ typedef enum POSTCONTENT_FLAGS_DEF
     POSTFLAG_IMAGES =  0x0001u,
     POSTFLAG_STICKY =  0x0002u,
     POSTFLAG_LOCKED =  0x0003u,
-    POSTFLAG_CYCLYC =  0x0004u
+    POSTFLAG_CYCLIC =  0x0004u
 } postflags_e;
 
+// These functions assume an already allocated postcontent_t.
+// You'll also need to free() it yourself (not needed when using
+// an actual thread)
+void post_dispose(postcontent_t* content);
 
-typedef struct POSTVIEW_DEF
+
+// Thread data
+// Linked list for handling thread data
+typedef struct IBTHREAD_NODE
 {
-    PANEL*         panel;
-    postcontent_t* content;
-} postview_t;
+    postcontent_t         content;
+    struct IBTHREAD_NODE* next;
+} ibthread_node_t;
 
-// TODO: post list
+typedef struct IBTHREAD_T
+{
+    ibthread_node_t*   first;
+    ibthread_node_t*   last;
+    unsigned long long numposts;
+} ibthread_t;
 
-void dispose_post(postcontent_t*);
+// These functions assume an already allocated ibthread_t.
+// You'll also need to free() it yourself
+void ibthread_init(ibthread_t* thread);
+void ibthread_dispose(ibthread_t* thread);
+void ibthread_add(ibthread_t* thread, postcontent_t* content);
+void ibthread_populate(ibthread_t* thread, const char* uri);
+void ibthread_populate_board(ibthread_t* board, const char* uri);
+
+// TODO: Move this somewhere soon
+char* curl_request(const char* uri);
 
 #endif

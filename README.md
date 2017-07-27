@@ -48,3 +48,10 @@ cmake ..
 make```
 
 
+## Dependencies
+- ncurses
+- panel for ncurses
+- libcaca (images to ascii; soon)
+- jansson
+- curl
+

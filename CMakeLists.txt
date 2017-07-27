@@ -7,12 +7,14 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 set(IBCONS_SOURCES
   src/main.c
   src/aesthetics.c
-  src/winctrl.c)
+  src/winctrl.c
+  src/postview.c)
 
 set(IBCONS_HEADERS
   src/main.h
   src/aesthetics.h
-  src/winctrl.h)
+  src/winctrl.h
+  src/postview.h)
 
 add_executable(ibcons ${IBCONS_SOURCES} ${IBCONS_HEADERS})
-target_link_libraries(ibcons ncursesw panel)
+target_link_libraries(ibcons ncursesw panel jansson curl)
