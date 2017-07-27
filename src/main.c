@@ -21,8 +21,7 @@ int main(int argc, char** argv)
     puts("Quickly testing stuff here.");
     puts("Fetching something.");
     thread = malloc(sizeof(ibthread_t));
-    //ibthread_populate(thread, "https://27chan.org/b/res/166189.json");
-    ibthread_populate(thread, "https://27chan.org/b/res/167124.json");
+    ibthread_populate(thread, "https://27chan.org/b/res/166189.json");
     
     init_all();
 
@@ -64,11 +63,19 @@ int main(int argc, char** argv)
             if(char_y_begin + 1 == 9) char_return = 1;
         }
 
-        // Separator
-        for(currchar = 1; currchar < x - 2; currchar++)
-            mvwaddch(contentviewer, (char_y < 10 ? 10 : char_y + 1), currchar, '-');
+        if(post->content.fsize) {
+            // Separator
+            for(currchar = 1; currchar < x - 2; currchar++)
+                mvwaddch(contentviewer, (char_y < (char_y_begin + 10)
+                                         ? (char_y_begin + 10) : char_y + 1), currchar, '-');
         
-        char_y += (char_y < 10) ? (12 - char_y) : 3;
+            char_y += (char_y < (char_y_begin + 10)) ? ((char_y_begin + 12) - char_y) : 3;
+        } else {
+            for(currchar = 1; currchar < x - 2; currchar++)
+                mvwaddch(contentviewer, char_y + 1, currchar, '-');
+        
+            char_y += 3;
+        }
     }
     refresh_all();
 

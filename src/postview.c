@@ -132,8 +132,9 @@ void ibthread_populate(ibthread_t* thread, const char* uri)
             if(current_field)
                 content.sub   = strdup(json_string_value(current_field));
 
-            current_field = json_object_get(current_post, "com"); // Always
-            content.com   = strdup(json_string_value(current_field));
+            current_field = json_object_get(current_post, "com"); // Always??
+            if(current_field)
+                content.com   = strdup(json_string_value(current_field));
 
             current_field = json_object_get(current_post, "name"); // Always
             content.name  = strdup(json_string_value(current_field));
