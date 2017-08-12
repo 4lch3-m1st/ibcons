@@ -1,6 +1,7 @@
 #ifndef IBCONS_POSTVIEW_H
 #define IBCONS_POSTVIEW_H
 
+#include <ncurses.h>
 #include <panel.h>
 
 // Post data
@@ -10,6 +11,7 @@ typedef struct POSTCONTENT_DEF
     char*              sub;  // subject
     char*              com;  // comment
     char*              name; // name
+    char*              capcode; // capcode
     unsigned long long time;
     unsigned long      omitted_posts;
     unsigned long      omitted_images;
@@ -65,7 +67,6 @@ void ibthread_add(ibthread_t* thread, postcontent_t* content);
 void ibthread_populate(ibthread_t* thread, const char* uri);
 void ibthread_populate_board(ibthread_t* board, const char* uri);
 
-// TODO: Move this somewhere soon
-char* curl_request(const char* uri);
-
+char* ibthread_parse_comment(char* com);
+void ibthread_print(WINDOW* w, const ibthread_t* thread);
 #endif

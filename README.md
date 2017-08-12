@@ -53,5 +53,6 @@ make```
 - panel for ncurses
 - libcaca (images to ascii; soon)
 - jansson
+- libxml
 - curl
 

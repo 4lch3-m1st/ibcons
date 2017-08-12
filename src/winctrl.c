@@ -11,6 +11,7 @@ void init_all(void)
     update_time.tv_sec = 0;
     update_time.tv_nsec = 400000;
     memset(inputbuf, 0, 80 * sizeof(char));
+    inputbuf[0] = '\0';
 
     RUNNING = TRUE;
     IBCONS_MSTATE = STATE_NONE;
@@ -23,7 +24,8 @@ void init_all(void)
     drawborders(commandline, 0);
 
     contentviewer = newwin(MAX_Y - 6, MAX_X, 3, 0);
-    drawborders(contentviewer, 0);
+    scrollok(contentviewer, TRUE);
+    //drawborders(contentviewer, 0);
 }
 
 void dispose_all(void)
@@ -57,6 +59,8 @@ void refresh_all(void)
 void inputhandler(void)
 {
     if(IBCONS_MSTATE == STATE_NONE) {
+        if(strcmp(inputbuf, ""));
+        
         char c = getch();
         switch(c) {
         case 'q':

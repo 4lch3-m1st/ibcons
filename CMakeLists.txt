@@ -8,13 +8,15 @@ set(IBCONS_SOURCES
   src/main.c
   src/aesthetics.c
   src/winctrl.c
-  src/postview.c)
+  src/postview.c
+  src/networking.c)
 
 set(IBCONS_HEADERS
   src/main.h
   src/aesthetics.h
   src/winctrl.h
-  src/postview.h)
+  src/postview.h
+  src/networking.h)
 
 add_executable(ibcons ${IBCONS_SOURCES} ${IBCONS_HEADERS})
 target_link_libraries(ibcons ncursesw panel jansson curl)

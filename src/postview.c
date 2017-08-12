@@ -1,8 +1,9 @@
 #include "postview.h"
+#include "networking.h"
 #include <jansson.h>
 #include <string.h>
 #include <assert.h>
-#include <curl/curl.h>
+#include <ncurses.h>
 
 #define free_existing(ptr) \
     if(ptr) free(ptr)
@@ -14,6 +15,7 @@ void post_dispose(postcontent_t* content)
     free_existing(content->name);
     free_existing(content->filename);
     free_existing(content->ext);
+    free_existing(content->capcode);
     // free(md5);
 }
 
@@ -133,11 +135,18 @@ void ibthread_populate(ibthread_t* thread, const char* uri)
                 content.sub   = strdup(json_string_value(current_field));
 
             current_field = json_object_get(current_post, "com"); // Always??
-            if(current_field)
+            if(current_field) {
                 content.com   = strdup(json_string_value(current_field));
+                // Tidy up HTML tags
+                
+            }
 
             current_field = json_object_get(current_post, "name"); // Always
             content.name  = strdup(json_string_value(current_field));
+
+            current_field = json_object_get(current_post, "capcode"); // Sometimes
+            if(current_field)
+                content.capcode = strdup(json_string_value(current_field));
 
             current_field = json_object_get(current_post, "time"); // Always
             content.time  = json_integer_value(current_field);
@@ -197,45 +206,87 @@ void ibthread_populate_board(ibthread_t* board, const char* uri)
 {
 }
 
-
-
-
-
-
-
-struct curl_string {
-    char *ptr;
-    size_t len;
-};
-
-
-static size_t remote_writeto_string(void* ptr, size_t size, size_t nmemb, struct curl_string* s)
+void ibthread_print(WINDOW* w, const ibthread_t* thread)
 {
-    size_t new_len = s->len + size*nmemb;
-    s->ptr = realloc(s->ptr, new_len+1);
-    assert(s->ptr != NULL);
-    memcpy(s->ptr+s->len, ptr, size*nmemb);
-    s->ptr[new_len] = '\0';
-    s->len = new_len;
+    unsigned char_y = 2, char_y_begin;
+    ibthread_node_t* post;
+    
+    for(post = thread->first; post != NULL; post = post->next)
+    {
+        char_y_begin = char_y;
+        int y, x;
+        unsigned xcaret = 1;
+        getmaxyx(w, y, x);
 
-    return size*nmemb;
+        // Post header
+        if(post->content.sub) {
+            mvwprintw(w, char_y, xcaret, "%s", post->content.sub);
+            xcaret += strlen(post->content.sub);
+            mvwprintw(w, char_y, xcaret, " - "); xcaret += 3;
+        }
+        // Name
+        mvwprintw(w, char_y, xcaret, "%s", post->content.name);
+        xcaret += strlen(post->content.name);
+
+        // Capcode, if existing
+        if(post->content.capcode) {
+            mvwprintw(w, char_y, xcaret, " ## %s", post->content.capcode);
+            xcaret += strlen(post->content.capcode) + 4;
+        }
+        
+        mvwprintw(w, char_y, xcaret, " No. "); xcaret += 5;
+        mvwprintw(w, char_y, xcaret, "%llu", post->content.no);
+        char_y++;
+
+        // Comments begin on line 2. Images too.
+        // Images are 8x18 characters wide.
+        size_t currchar = 0;
+        unsigned char_return = post->content.fsize ? 20 : 1;
+        unsigned char_x = char_return;
+        if(post->content.com) {
+            for(currchar = 0; currchar < strlen(post->content.com); currchar++) {
+                // Halt everything if we reached the end of the window (for now)
+                if(char_y == y - 1)
+                    return;
+            
+                char current = post->content.com[currchar];
+                if(current == '\n') {
+                    char_y++;
+                    char_x = char_return;
+                } else {
+                    // Temporary unicode fix
+                    if(current > 255 || current < 0)
+                         current = ' ';
+                    
+                    mvwaddch(w, char_y, char_x, current);
+                    char_x++;
+                    if(char_x >= x - 2) {
+                        char_y++;
+                        char_x = char_return;
+                    }
+                    if(char_y_begin + 1 == 9) char_return = 1;
+                }
+            }
+
+            if(post->content.fsize) {
+                // Separator
+                for(currchar = 1; currchar < x - 2; currchar++)
+                    mvwaddch(w, (char_y < (char_y_begin + 10)
+                                 ? (char_y_begin + 10) : char_y + 1), currchar, '-');
+        
+                char_y += (char_y < (char_y_begin + 10)) ? ((char_y_begin + 12) - char_y) : 3;
+            } else {
+                for(currchar = 1; currchar < x - 2; currchar++)
+                    mvwaddch(w, char_y + 1, currchar, '-');
+        
+                char_y += 3;
+            }
+        }
+    }
 }
 
-char* curl_request(const char* uri)
+char* ibthread_parse_comment(char* com)
 {
-    CURL* curl;
-    CURLcode res;
-    struct curl_string str;
-    str.len = 0;
-    str.ptr = strdup("");
-
-    curl =  curl_easy_init();
-    
-    curl_easy_setopt(curl, CURLOPT_URL, uri);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, remote_writeto_string);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str);
-    res = curl_easy_perform(curl);
-
-    curl_easy_cleanup(curl);
-    return str.ptr;
+    if(!com) return NULL;
+    return com;
 }
